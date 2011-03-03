@@ -169,7 +169,7 @@ def draw():
             verticies = polygon.GetVerticies()
             points = []
             
-            cull_poly = False
+            render_poly = False
             
             for vertex in verticies:
                 withinAABB = True
@@ -188,6 +188,7 @@ def draw():
                     vertex[1] > top or vertex [1] < -(top)):
                     withinAABB = False
                 
+                #only polgyons completely outside the AABB are culled
                 if(withinAABB == True):
                     cull_poly = True
                     
