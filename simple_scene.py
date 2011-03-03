@@ -1,3 +1,8 @@
+"""
+Bryan Petzinger
+VR hw 5
+"""
+
 from Geometry import *
 import pygame
 
