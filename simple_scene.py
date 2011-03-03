@@ -4,58 +4,120 @@ import pygame
 running = 1
 camera = Camera()
 line_color = (0, 0, 255)
-screen = pygame.display.set_mode((800, 600))
+screen_width = 800
+screen_height = 600
+screen = pygame.display.set_mode((screen_width, screen_height))
 
 #simple orthographic projection (drop z coord)
 ortho = Matrix([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 0, 0], [0, 0, 0, 1]])
 
 #perspective projection
-far = -1
-near = 1
 right = 1
 top = 1
+near = 1
+far = 10
 perspective = Matrix([  [near/right, 0, 0, 0], \
                         [0, near/top, 0, 0], \
                         [0, 0, (-(far+near))/(-1), (-2*far*near)/(far-near)], \
                         [0, 0, -1, 0]])
 
-p1 = Polygon([[0,0,0], [100,0,0], [100, 75, 0], [0,75,0]])
-p2 = Polygon([[0, 85, 0], [0, 150, 0], [50, 150, 0], [50, 85, 0]])
-p3 = Polygon([[35, 15, 0], [35, 45, 0], [75, 45, 0], [75, 15, 0]])
-mesh_p = Mesh([p1, p2, p3])
+#letter P
+p1 = Polygon([	Vertex(0, 1, 0), \
+                Vertex(1, 1, 0), \
+                Vertex(1, 0, 0), \
+                Vertex(0.25, 0, 0), \
+                Vertex(0.25, -1, 0), \
+                Vertex(0, -1, 0), \
+                Vertex(0, 0, 0)])
+
+p2 = Polygon([  Vertex(0.25, 0.75, 0), \
+                Vertex(0.75, 0.75, 0), \
+                Vertex(0.75, 0.25, 0), \
+                Vertex(0.25, 0.25, 0)])
+
+mesh_p = Mesh([p1, p2])
 p = Object(mesh_p)
-p.Translate(Matrix().Translate(0, 0, 0))
+p.Translate(Matrix().Translate(-1.5, 0, 0))
 
-e1 = Polygon([[0, 0, 0], [100, 0, 0], [100, 40, 0], [0, 40, 0]])
-e2 = Polygon([[0, 60, 0], [75, 60, 0], [75, 90, 0], [0, 90, 0]])
-e3 = Polygon([[0, 110, 0], [100, 110, 0], [100, 150, 0], [0, 150, 0]])
-mesh_e = Mesh([e1, e2, e3])
+#letter E
+e1 = Polygon([	Vertex(0, 1, 0), \
+                Vertex(1, 1, 0), \
+                Vertex(1, 0.75, 0), \
+                Vertex(0.25, 0.75, 0), \
+                Vertex(0.25, 0.1, 0), \
+                Vertex(0.75, 0.1, 0), \
+                Vertex(0.75, -0.1, 0), \
+                Vertex(0.25, -0.1, 0), \
+                Vertex(0.25, -0.75, 0), \
+                Vertex(1, -0.75, 0), \
+                Vertex(1, -1, 0), \
+                Vertex(0, -1, 0),])
+
+mesh_e = Mesh([e1])
 e = Object(mesh_e)
-e.Translate(Matrix().Translate(150, 0, 0))
 
-t1 = Polygon([[0, 0, 0], [100, 0, 0], [100, 40, 0], [0, 40, 0]])
-t2 = Polygon([[30, 50, 0], [70, 50, 0], [70, 150, 0], [30, 150, 0]])
-mesh_t = Mesh([t1, t2])
+#letter T
+t1 = Polygon([	Vertex(-1, 1, 0), \
+                Vertex(1, 1, 0), \
+                Vertex(1, 0.75, 0), \
+                Vertex(0.25, 0.75, 0), \
+                Vertex(0.25, -1, 0), \
+                Vertex(-0.25, -1, 0), \
+                Vertex(-0.25, 0.75, 0), \
+                Vertex(-1, 0.75, 0)])
+
+mesh_t = Mesh([t1])
 t = Object(mesh_t)
-t.Translate(Matrix().Translate(300, 0, 0))
+t.Translate(Matrix().Translate(1.5, 0, 0))
 
-c1 = Polygon([[0, 0, 0], [0, 50, 0], [50, 50, 0], [50, 0, 0]], (255, 0, 0)) # red
-c2 = Polygon([[0, 0, 50], [0, 50, 50], [50, 50, 50], [50, 0, 50]], (0, 255, 0)) # green
-c3 = Polygon([[0, 0, 0], [0, 0, 50], [0, 50, 50], [0, 50, 0]], (0, 0, 255)) # blue
-c4 = Polygon([[50, 0, 0], [50, 0, 50], [50, 50, 50], [50, 50, 0]], (255, 255, 0)) # yellow
-c5 = Polygon([[0, 0, 0], [50, 0, 0], [50, 0, 50], [0, 0, 50]], (255, 0, 255)) # pink
-c6 = Polygon([[0, 50, 0], [50, 50, 0], [50, 50, 50], [0, 50, 50]], (0, 255, 255)) # cyan
-mesh_cube = Mesh([c1, c2, c3, c4, c5, c6])
+#cube
+cube_front = Polygon([	Vertex(1, 1, 1), \
+		                Vertex(-1, 1, 1), \
+		                Vertex(-1, -1, 1), \
+		                Vertex(1, -1, 1)], \
+                        (255, 0, 0)) # red
+
+cube_back = Polygon([	Vertex(1, 1, -1), \
+		                Vertex(-1, 1, -1), \
+		                Vertex(-1, -1, -1), \
+		                Vertex(1, -1, -1)], \
+                        (0, 255, 0)) # green
+
+cube_left = Polygon([	Vertex(-1, 1, 1), \
+		                Vertex(-1, 1, -1), \
+		                Vertex(-1, -1, -1), \
+		                Vertex(-1, -1, 1)], \
+                        (0, 0, 255)) # blue
+
+cube_right = Polygon([	Vertex(1, 1, 1), \
+		                Vertex(1, 1, -1), \
+		                Vertex(1, -1, -1), \
+		                Vertex(1, -1, 1)], \
+                        (255, 255, 0)) # yellow
+
+cube_top = Polygon([    Vertex(1, 1, -1), \
+                        Vertex(-1, 1, -1), \
+		                Vertex(-1, 1, 1), \
+		                Vertex(1, 1, 1)], \
+                        (255, 0, 255)) # pink
+
+cube_bottom = Polygon([ Vertex(1, -1, -1), \
+                        Vertex(-1, -1, -1), \
+		                Vertex(-1, -1, 1), \
+		                Vertex(1, -1, 1)], \
+                        (0, 255, 255)) # cyan
+
+mesh_cube = Mesh([cube_front, cube_back, cube_left, cube_right, cube_top, cube_bottom])
 cube_parent = Object(mesh_cube)
-cube_parent.Translate(Matrix().Translate(450, 0, 0))
+cube_parent.Translate(Matrix().Translate(5, 0, 0))
 
 cube_child = Object(mesh_cube)
 cube_child.SetParent(cube_parent)
-cube_child.Translate(Matrix().Translate(100, 100, 0))
+cube_child.Translate(Matrix().Translate(-3, 3, 0))
 
 objects = [p, e, t, cube_parent, cube_child]
 
-camera.Translate(Matrix().Translate(50, 100, 0))
+camera.Translate(Matrix().Translate(.5, 0, -10))
 
 count = 0
 x = 1
@@ -68,16 +130,17 @@ def animate():
     count += 1
 
     #P
-    p.Translate(Matrix().Translate(0,x*2,0))
+    p.Translate(Matrix().Translate(0,x*.1,0))
 
     #E
     e.Rotate(Matrix().RotateY(.1))
 
     #T
+    scale_factor = 1.1
     if x == 1:
-        t.Scale(Matrix().Scale(1.1, 1.1, 1.1))
+        t.Scale(Matrix().Scale(scale_factor, scale_factor))
     else:
-        t.Scale(Matrix().Scale(.9, .9, .9))
+        t.Scale(Matrix().Scale(1/scale_factor, 1/scale_factor))
 
     #parent cube
     cube_parent.Rotate(Matrix().RotateX(0.1))
@@ -90,24 +153,36 @@ def animate():
 
 def draw():
     for obj in objects:
-        #apply projection, camera, world transforms        
-
+        #local -> world -> camera -> projection
         if(obj.GetParent() != None):
             con_matrix = perspective * camera.GetViewMatrix() * obj.GetParent().GetConMatrix() * obj.GetConMatrix()
         else:
             con_matrix =  perspective * camera.GetViewMatrix() * obj.GetConMatrix()
-        for polygon in obj.GetMesh().GetPolygons():
 
+        for polygon in obj.GetMesh().GetPolygons():
             verticies = polygon.GetVerticies()
-            for i in range(len(verticies)):
-                v = verticies[i]
-                point_a = con_matrix * Vertex(v[0], v[1], v[2])                
-                if(i+1 < len(verticies)):
-                    v = verticies[i+1]
-                else:
-                    v = verticies[0]
-                point_b = con_matrix * Vertex(v[0], v[1], v[2])                
-                pygame.draw.line(screen, polygon.GetColor(), (point_a[0], point_a[1]), (point_b[0], point_b[1]))
+            points = []
+
+            for vertex in verticies:
+                #apply concatenated proj/cam/world transforms
+                vertex = con_matrix * vertex
+                #normalize w coord of vertex and convert to point (x, y)
+                point = divide_by_w(vertex)
+                #convert point to screen coords
+                point = convert_to_screen(point)
+                points.append(point)
+
+            pygame.draw.lines(screen, polygon.GetColor(), True, points)
+
+def divide_by_w(vertex):
+    w = vertex[3]
+    return (vertex[0]/w, vertex[1]/w)
+
+def convert_to_screen(point):
+    x = point[0] * (screen_width/2) + (screen_width/2)
+    y = -1.0 * point[1] * (screen_height/2) + (screen_height/2)
+    return (x, y)
+    
 
 while running:
     pygame.time.Clock().tick(180)
@@ -120,3 +195,5 @@ while running:
     animate()
     draw()
     pygame.display.flip()
+
+pygame.quit()
