@@ -148,6 +148,13 @@ class Object:
     self.world_scale = Matrix().Scale()
     self.world_translate = Matrix().Translate()
     self.parent = None
+    self.color = None
+    
+  def SetColor(self, color):
+    self.color = color
+    
+  def GetColor(self):
+    return self.color
 
   def ReferenceMesh(self, mesh):
     self.mesh = mesh
@@ -186,5 +193,8 @@ class Camera:
     return Matrix(self.view_translate * self.view_rotate * self.view_scale)
 
   def Translate(self, trans_matrix):
-    self.view_translate = self.view_translate * trans_matrix
+    self.view_translate *= trans_matrix
+    
+  def Rotate(self, rot_matrix):
+    self.view_rotate *= rot_matrix
 
