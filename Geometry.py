@@ -141,7 +141,7 @@ class Mesh:
   def __len__(self):
     return len(self.polygons)
     
-class Object:
+class Object(object):
   def __init__(self, mesh = None):
     self.mesh = mesh
     self.world_rotate = Matrix()
@@ -164,6 +164,9 @@ class Object:
 
   def GetParent(self):
     return self.parent
+    
+  def SetPos(self, (x, y, z)):
+    self.world_translate = Matrix().Translate(x, y, z)
 
   def Rotate(self, rot_matrix):
     self.world_rotate *= rot_matrix
@@ -181,7 +184,7 @@ class Object:
     return self.world_translate
 
   def GetConMatrix(self):
-    return Matrix(self.world_translate * self.world_rotate * self.world_scale)
+    return Matrix(self.world_scale * self.world_rotate * self.world_translate)
 
 class Camera:
   def __init__(self):
@@ -190,7 +193,7 @@ class Camera:
     self.view_translate = Matrix().Translate()
 
   def GetViewMatrix(self):
-    return Matrix(self.view_translate * self.view_rotate * self.view_scale)
+    return Matrix(self.view_scale * self.view_rotate * self.view_translate)
 
   def Translate(self, trans_matrix):
     self.view_translate *= trans_matrix

@@ -1,11 +1,23 @@
+import pygame
+from random import random
+from pygame.locals import *
 from Geometry import *
 from terrain import *
-import pygame
-from pygame.locals import *
-   
+
 def animate():
-    pass
+    for pred in pred_list:
+        move_random(pred)
     
+    for prey in prey_list:
+        move_random(prey)
+
+    for pred in pred_list:
+        for prey in prey_list:
+            if(check_distance(pred, prey) <= 2):
+                #simulate prey being destroyed and new prey taking its place
+                print 'predator caught prey!'
+                prey.SetPos((0,1,0))
+
 def draw():
     for obj in objects:
         #local -> world -> camera -> projection
@@ -50,7 +62,7 @@ def draw():
                     color = obj.GetColor()
                 else: color = polygon.GetColor()               
 
-#                pygame.draw.polygon(screen, color, points)
+                #pygame.draw.polygon(screen, color, points)
                 pygame.draw.lines(screen, color, True, points)
                 
 
@@ -65,23 +77,33 @@ def convert_to_screen(vertex):
     y = -1.0 * vertex[1] * (screen_height/2) + (screen_height/2)
     return (x, y)
 
-def create_boid():
-    a = Vertex(0.0, 1.0, 0.0)
-    b = Vertex(0.3, 0.0, 0.0)
-    c = Vertex(-0.3, 0.0, 0.0)
-    d = Vertex(0.0, 0.3, 0.3)
-
-    left = Polygon([a, d, c], (255, 0, 0)) # red
-    right = Polygon([a, b, d], (0, 255, 0)) # green
-    back = Polygon([d, b, c], (0, 0, 255)) # blue
-    #bottom = Polygon([a, b, c], (255, 255, 0)) # yellow
-                                        
-    return Mesh([left, right, back]) 
-
 def check_distance(obj1, obj2):
-    print obj1.GetConMatrix()
-    print obj2.GetConMatrix()
+    m1 = obj1.GetConMatrix()    
+    m2 = obj2.GetConMatrix()
+    distance = ((m1[0][3] - m2[0][3])**2 +(m1[1][3] - m2[1][3])**2 + (m1[2][3] - m2[2][3])**2)**.5
+    return distance
     
+def set_random_pos(obj):
+    x = (random()*(size-4))+2
+    z = (random()*(size-4))+2
+    obj.SetPos((x, 1, z))
+    
+def move_random(obj):
+    m = obj.GetConMatrix()
+    if (m[0][3] < 2):
+        x = 1
+    elif (m[0][3] > size-2):
+        x = -1
+    else: x = random()*2 - 1
+
+    if (m[2][3] < 2):
+        z = 1        
+    elif (m[2][3] > size-2):
+        z = -1
+    else: z = random()*2 - 1
+    
+    obj.Translate(Matrix().Translate(x, 0, z))
+
 running = 1
 camera = Camera()
 line_color = (0, 0, 255)
@@ -103,26 +125,67 @@ perspective = Matrix([  [near/right, 0, 0, 0], \
                         [0, 0, -1, 0] \
                     ])
 
-#camera.Translate(Matrix().Translate(-5, -10, -40))
-camera.Translate(Matrix().Translate(-2, 0, -10))
-#camera.Rotate(Matrix().RotateX(.5))
-
-t = Terrain(16)
-t.applyHeightmap('heightmap.bmp')
+camera.Translate(Matrix().Translate(-8, -10, -20))
+camera.Rotate(Matrix().RotateX(.5))
+size = 16
+t = Terrain(size)
+t.applyHeightmap('heightmap16.bmp')
 terrain_polys = t.to_polys()
 terrain_mesh = Mesh(terrain_polys)
 terrain = Object(terrain_mesh)
 
-boid_mesh = create_boid()
-boid1 = Object(boid_mesh)
-boid2 = Object(boid_mesh)
+tri_a = Vertex(0.0, 0.0, -0.3)
+tri_b = Vertex(0.3, 0.0, 0.0)
+tri_c = Vertex(-0.3, 0.0, 0.0)
+tri_d = Vertex(0.0, 0.3, -0.3)
 
-objects = [boid1, boid2]
+tri_left = Polygon([tri_a, tri_d, tri_c], (255, 255, 0))
+tri_right = Polygon([tri_a, tri_b, tri_d], (255, 255, 0))
+tri_back = Polygon([tri_d, tri_b, tri_c], (255, 255, 0))
+#tri_bottom = Polygon([a, b, c], (255, 255, 0))
+                                        
+tri_mesh = Mesh([tri_left, tri_right, tri_back])
+prey_1 = Object(tri_mesh)
+prey_2 = Object(tri_mesh)
+prey_3 = Object(tri_mesh)
+prey_4 = Object(tri_mesh)
+prey_5 = Object(tri_mesh)
 
-check_distance(boid1, boid2)
+prey_list = [prey_1, prey_2, prey_3, prey_4, prey_5]
+for prey in prey_list:
+    set_random_pos(prey)
+
+cube_a = Vertex(-0.5, 0.5, 0.5)
+cube_b = Vertex(0.5, 0.5, .5)
+cube_c = Vertex(0.5, -0.5, 0.5)
+cube_d = Vertex(-0.5, -0.5, 0.5)
+cube_e = Vertex(-0.5, 0.5, -0.5)
+cube_f = Vertex(0.5, 0.5, -0.5)
+cube_g = Vertex(0.5, -0.5, -0.5)
+cube_h = Vertex(-0.5, -0.5, -0.5)
+
+cube_front = Polygon([cube_a, cube_b, cube_c, cube_d], (255, 0, 0))
+cube_back = Polygon([cube_e, cube_f, cube_g, cube_h], (255, 0, 0))
+cube_top = Polygon([cube_e, cube_f, cube_b, cube_a], (255, 0, 0))
+cube_bottom = Polygon([cube_h, cube_g, cube_c, cube_d], (255, 0, 0))
+cube_left = Polygon([cube_e, cube_a, cube_d, cube_h], (255, 0, 0))
+cube_right = Polygon([cube_b, cube_f, cube_g, cube_c], (255, 0, 0))
+
+cube_mesh = Mesh([cube_front, cube_back, cube_top, cube_bottom, cube_left, cube_right])
+pred_1 = Object(cube_mesh)
+pred_2 = Object(cube_mesh)
+pred_3 = Object(cube_mesh)
+
+pred_list = [pred_1, pred_2, pred_3]
+for pred in pred_list:
+    set_random_pos(pred)
+
+objects = [terrain]
+objects.extend(pred_list)
+objects.extend(prey_list)
 
 while running:
-    pygame.time.Clock().tick(180)
+    pygame.time.Clock().tick(1)
 
     for event in pygame.event.get():
         if event.type == QUIT:
@@ -145,7 +208,15 @@ while running:
             if event.key == K_d:
                 #move right
                 camera.Translate(Matrix().Translate(-1,0,0))
-            
+                
+            if event.key == K_r:
+                #move up
+                camera.Translate(Matrix().Translate(0,-1,0))
+                
+            if event.key == K_f:
+                #move down
+                camera.Translate(Matrix().Translate(0,1,0))
+                
             if event.key == K_UP:
                 #rotate up
                 camera.Rotate(Matrix().RotateX(.1))
@@ -162,13 +233,11 @@ while running:
                 #rotate right
                 camera.Rotate(Matrix().RotateY(.1))
                                 
-    event = pygame.event.poll()
-    if event.type == pygame.QUIT:
-        running = 0
-
     screen.fill((0, 0, 0))
+    
     animate()
     draw()
+    
     pygame.display.flip()
 
 pygame.quit()

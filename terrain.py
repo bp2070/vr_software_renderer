@@ -38,7 +38,7 @@ class Terrain:
     def getdata(self):
         return self.data
 
-    def to_polys(self, scale = .1):
+    def to_polys(self, scale = .01):
         polygons = []
         for i in range(self.size-1):
             for j in range(self.size-1):
